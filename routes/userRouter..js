@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { updateRole } = require("../controllers/userController");
-const { adminAuth } = require("../middleware/auth");
+const { auth } = require("../middleware/auth");
 
-router.patch("/updateRole", adminAuth(["admin"]), updateRole);
+router.patch("/updateRole", auth(["admin"]), updateRole);
 
 module.exports = router;
