@@ -23,3 +23,18 @@ exports.addShow = async (req, res, next) => {
   }
 };
 
+exports.findShowById = async (req, res, next) => {
+  const { id } = req.query;
+  try {
+    const show = await showModel
+      .findOne({ _id: id })
+      .populate("details.actors")
+      .populate("details.producers")
+      .populate("details.directors");
+    res.status(200).json(show);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
