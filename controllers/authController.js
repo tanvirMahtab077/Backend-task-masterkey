@@ -1,5 +1,6 @@
 const User = require("../model/User");
 var validator = require("email-validator");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 exports.register = async (req, res, next) => {
@@ -36,6 +37,62 @@ exports.register = async (req, res, next) => {
     console.error(err);
     res.status(401).json({
       message: "User not created successful",
+      error: err.message,
+    });
+  }
+};
+
+
+exports.login = async (req, res, next) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({
+      message: "Email or Password not present",
+    });
+  }
+  try {
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(401).json({
+        message: "User not found. Please Register....",
+      });
+    }
+
+    const validPass = await bcrypt.compare(password, user.password);
+    if (!validPass) {
+      return res.status(400).json({ message: "Password does not match" });
+    }
+
+    const accessToken = jwt.sign(
+      {
+        userName: user.userName,
+        role: user.role,
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "2m" }
+    );
+
+    const refreshToken = jwt.sign(
+      { userName: user.userName },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.cookie("jwt", refreshToken, {
+      httpOnly: true,
+      // secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Successfully Logged In", accessToken });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({
+      message: "An error occurred",
       error: err.message,
     });
   }

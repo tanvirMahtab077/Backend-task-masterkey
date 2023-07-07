@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
-const intexRouter = require("./routes/index");
+const intdexRouter = require("./routes/index");
 const app = express();
 
 dotenv.config();
@@ -24,4 +24,4 @@ mongoose
 // adding middleware
 app.use(cookieParser());
 app.use(express.json());
-app.use("/api", intexRouter);
+app.use("/api", intdexRouter);
