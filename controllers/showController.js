@@ -38,3 +38,17 @@ exports.findShowById = async (req, res, next) => {
   }
 };
 
+exports.findAllShow = async (req, res, next) => {
+  try {
+    const showList = await showModel.find();
+    if (showList) {
+      return res.status(200).json(showList);
+    }else{
+      return res.status(404).json({message:'No show found'});
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({error:error.message});
+  }
+};
+
